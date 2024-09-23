@@ -1,0 +1,23 @@
+.pivo {
+    position: absolute;
+    width: 40%;
+    left: 30%;
+    top: 15%;
+    cursor: pointer;
+}
+
+.pivo:active > .pivo-image {
+    scale: 1.1;
+}
+
+.pivo-image {
+    width: 100%;
+    transition: scale 100ms;
+}
+
+.counter {
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    top: 3%;
+}
