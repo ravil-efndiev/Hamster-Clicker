@@ -9,17 +9,32 @@ import { useState } from "react";
 
 interface Props {
   balance: number;
+  multitapLevel: number;
+  autotapLevel: number;
+  crittapLevel: number;
   onPurchaseAbort: () => void;
+  onBalanceChange: (value: number) => void;
+  onStatChange: (type: ItemType, vlaue: number) => void;
 }
 
-function Shop({ balance, onPurchaseAbort }: Props) {
-  const [multitapLevel, setMultitapLevel] = useState(0);
-  const [autotapLevel, setAutotapLevel] = useState(0);
-  const [crittapLevel, setCrittapLevel] = useState(0);
-
-  const nextTapGain = multitapTemplate.baseValue * (multitapLevel + 1);
-  const nextAutotapRate = autotapTemplate.baseValue / (autotapLevel + 1);
-  const nextCritChance = crittapTemplate.baseValue * (crittapLevel + 1);
+function Shop({
+  balance,
+  multitapLevel,
+  autotapLevel,
+  crittapLevel,
+  onPurchaseAbort,
+  onBalanceChange,
+  onStatChange,
+}: Props) {
+  const [nextTapGain, setNextTapGain] = useState(
+    multitapTemplate.baseValue * (multitapLevel + 1)
+  );
+  const [nextAutotapRate, setNextAutotapRate] = useState(
+    autotapTemplate.baseValue / (autotapLevel + 1)
+  );
+  const [nextCritChance, setNextCritChance] = useState(
+    crittapTemplate.baseValue * (crittapLevel + 1)
+  );
 
   const handleItemPurchase = (type: ItemType, price: number) => {
     if (balance < price) {
@@ -29,13 +44,28 @@ function Shop({ balance, onPurchaseAbort }: Props) {
 
     switch (type) {
       case ItemType.multitap:
-        console.log("purchased multitap");
+        setNextTapGain(multitapTemplate.baseValue + (multitapLevel + 1));
+        onStatChange(
+          ItemType.multitap,
+          multitapTemplate.baseValue + multitapLevel
+        );
+        onBalanceChange(balance - price);
         break;
       case ItemType.autotap:
-        console.log("purchased autotap");
+        setNextAutotapRate(autotapTemplate.baseValue / (autotapLevel + 2));
+        onStatChange(
+          ItemType.autotap,
+          autotapTemplate.baseValue / (autotapLevel + 1)
+        );
+        onBalanceChange(balance - price);
         break;
       case ItemType.crittap:
-        console.log("purchased crittap");
+        setNextCritChance(crittapTemplate.baseValue * (crittapLevel + 1));
+        onStatChange(
+          ItemType.crittap,
+          crittapTemplate.baseValue * (crittapLevel + 1)
+        );
+        onBalanceChange(balance - price);
         break;
     }
   };
@@ -53,7 +83,9 @@ function Shop({ balance, onPurchaseAbort }: Props) {
         <ShopItem
           type={ItemType.autotap}
           itemName={`Autotap ${autotapLevel + 1}`}
-          itemDesc={`Automatically get a point every ${nextAutotapRate / 1000} seconds`}
+          itemDesc={`Automatically get a point every ${
+            nextAutotapRate / 1000
+          } seconds`}
           itemPrice={autotapTemplate.basePrice * (autotapLevel + 1)}
           onPurchase={handleItemPurchase}
         />
@@ -61,9 +93,33 @@ function Shop({ balance, onPurchaseAbort }: Props) {
           type={ItemType.crittap}
           itemName={`Crittap ${crittapLevel + 1}`}
           itemDesc={`Every tap has ${nextCritChance}% chance to gain 5x the normal value`}
-          itemPrice={autotapTemplate.basePrice * (autotapLevel + 1)}
+          itemPrice={crittapTemplate.basePrice * (crittapLevel + 1)}
           onPurchase={handleItemPurchase}
         />
+        <ShopItem
+          type={ItemType.multitap}
+          itemName={`blank`}
+          itemDesc={``}
+          itemPrice={0}
+          onPurchase={() => console.log("not implemented")}
+        />
+        <ShopItem
+          type={ItemType.autotap}
+          itemName={`blank`}
+          itemDesc={``}
+          itemPrice={0}
+          onPurchase={() => console.log("not implemented")}
+        />
+        <ShopItem
+          type={ItemType.crittap}
+          itemName={`blank`}
+          itemDesc={``}
+          itemPrice={0}
+          onPurchase={() => console.log("not implemented")}
+        />
+        <div className="shop-balance">
+          <p className="text-center">${balance}</p>
+        </div>
       </div>
     </>
   );

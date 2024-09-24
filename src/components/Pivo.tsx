@@ -1,27 +1,25 @@
 import { useState } from "react";
-import logo from "../assets/pivo.png" 
+import logo from "../assets/hamster-logo.png";
 
 interface Props {
-  tapGain: number;  
-  onCounterChange: (value: number) => void;
+  counter: number;
+  active: boolean;
+  onTap: () => void;
 }
 
-function Pivo({tapGain, onCounterChange}: Props) {
-  const [counter, setCounter] = useState(0);
-
-  const handlePivoClick = () => {
-    setCounter(counter + tapGain);
-    onCounterChange(counter);
-  }
+function Pivo({ onTap, counter, active }: Props) {
+  const handleTap = () => {
+    onTap();
+  };
 
   return (
     <>
       <h2 className="counter">{counter}</h2>
-      <div className="pivo" onClick={handlePivoClick}>
+      <div className={`pivo ${!active && "disabled"}`} onClick={handleTap}>
         <img src={logo} alt="Pivo" className="pivo-image" />
       </div>
     </>
   );
 }
 
-export default Pivo
+export default Pivo;

@@ -1,4 +1,3 @@
-import logo from "../assets/pivo.png";
 import { ItemType } from "../Templates";
 
 interface Props {
@@ -16,7 +15,6 @@ function ShopItem(props: Props) {
         className="card shop-item"
         onClick={() => props.onPurchase(props.type, props.itemPrice)}
       >
-        <img src={logo} className="card-img-top shop-item__image" alt="" />
         <div className="card-body">
           <h5 className="card-title shop-item__title">{props.itemName}</h5>
           <p className="card-text shop-item__text">{props.itemDesc}</p>
