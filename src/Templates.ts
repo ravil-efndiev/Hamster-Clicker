@@ -10,7 +10,7 @@ export const multitapTemplate: Template = {
 };
 
 export const autotapTemplate: Template = {
-  basePrice: 2,
+  basePrice: 400,
   baseValue: 2000,
 };
 

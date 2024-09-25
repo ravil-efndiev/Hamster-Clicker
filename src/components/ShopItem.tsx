@@ -12,7 +12,7 @@ function ShopItem(props: Props) {
   return (
     <>
       <div
-        className="card shop-item"
+        className="card shop-item text-center"
         onClick={() => props.onPurchase(props.type, props.itemPrice)}
       >
         <div className="card-body">

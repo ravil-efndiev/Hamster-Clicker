@@ -3,6 +3,8 @@ import "./App.css";
 import Pivo from "./components/Pivo";
 import Shop from "./components/Shop";
 import ShopToggle from "./components/ShopToggle";
+import Cheats from "./components/Cheats";
+import StatsDisplay from "./components/StatsDisplay";
 import { ItemType } from "./Templates";
 
 function App() {
@@ -16,20 +18,22 @@ function App() {
   const [stats, setStats] = useState({
     tapGain: 1,
     autotapRate: 0,
-    critChance: 0
+    critChance: 0,
   });
+
+  const browserUpdateMs = 40;
+  const enableCheats = false;
 
   useEffect(() => {
     let timer = 0;
     const interval = setInterval(() => {
-      if (!stats.autotapRate)
-        return 40;
-      timer += 40;
+      if (!stats.autotapRate) return;
+      timer += browserUpdateMs;
       if (timer >= stats.autotapRate) {
-        setBalance(prevBalance => prevBalance + 1);
+        setBalance((prevBalance) => prevBalance + 1);
         timer = 0;
       }
-    }, 40);
+    }, browserUpdateMs);
 
     return () => clearInterval(interval);
   }, []);
@@ -37,28 +41,28 @@ function App() {
   const handleStatChange = (type: ItemType, value: number) => {
     switch (type) {
       case ItemType.multitap:
-        setStats(prev => {
+        setStats((prev) => {
           const newStats = prev;
           newStats.tapGain = value;
           return newStats;
         });
-        setMultitapLevel(prevLvl => prevLvl + 1);
+        setMultitapLevel((prevLvl) => prevLvl + 1);
         break;
       case ItemType.autotap:
-        setStats(prev => {
+        setStats((prev) => {
           const newStats = prev;
           newStats.autotapRate = value;
           return newStats;
         });
-        setAutotapLevel(prevLvl => prevLvl + 1);
+        setAutotapLevel((prevLvl) => prevLvl + 1);
         break;
       case ItemType.crittap:
-        setStats(prev => {
+        setStats((prev) => {
           const newStats = prev;
           newStats.critChance = value;
           return newStats;
         });
-        setCrittapLevel(prevLvl => prevLvl + 1);
+        setCrittapLevel((prevLvl) => prevLvl + 1);
         break;
     }
   };
@@ -68,16 +72,27 @@ function App() {
   };
 
   const handleTap = () => {
-    setBalance(prevBalance => prevBalance + stats.tapGain);
+    setBalance((prevBalance) => prevBalance + stats.tapGain);
   };
 
   const handleShopToggle = () => {
     setShopActive(!shopActive);
-  }
+  };
 
   return (
     <>
+      {enableCheats && (
+        <Cheats onCheatApply={() => setBalance((prev) => prev + 1000)} />
+      )}
       <ShopToggle onShopToggle={handleShopToggle} />
+      <StatsDisplay
+        multitapLvl={multitapLevel}
+        autotapLvl={autotapLevel}
+        crittapLvl={crittapLevel}
+        tapGain={stats.tapGain}
+        autotapRate={stats.autotapRate}
+        critChance={stats.critChance}
+      />
       <Pivo onTap={handleTap} counter={balance} active={!shopActive} />
       <div className="shop-wrapper">
         {shopActive && (
