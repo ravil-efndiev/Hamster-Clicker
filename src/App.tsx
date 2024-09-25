@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, MouseEvent } from "react";
 import "./App.css";
-import Pivo from "./components/Pivo";
+import Hamster from "./components/Hamster";
 import Shop from "./components/Shop";
 import ShopToggle from "./components/ShopToggle";
 import Cheats from "./components/Cheats";
 import StatsDisplay from "./components/StatsDisplay";
+import PlusEffect, { Position } from "./components/PlusEffect";
 import { ItemType } from "./Templates";
 
 function App() {
@@ -15,68 +16,53 @@ function App() {
   const [autotapLevel, setAutotapLevel] = useState(0);
   const [crittapLevel, setCrittapLevel] = useState(0);
 
-  const [stats, setStats] = useState({
-    tapGain: 1,
-    autotapRate: 0,
-    critChance: 0,
-  });
+  const [tapGain, setTapGain] = useState(1);
+  const [autotapRate, setAutotapRate] = useState(0);
+  const [critChance, setCritChance] = useState(0);
 
-  const browserUpdateMs = 40;
+  const [effectPositions, setEffectPositions] = useState<Position[]>([]);
+
   const enableCheats = false;
 
   useEffect(() => {
-    let timer = 0;
     const interval = setInterval(() => {
-      if (!stats.autotapRate) return;
-      timer += browserUpdateMs;
-      if (timer >= stats.autotapRate) {
-        setBalance((prevBalance) => prevBalance + 1);
-        timer = 0;
-      }
-    }, browserUpdateMs);
+      if (!autotapRate) return;
+      setBalance((prevBalance) => prevBalance + 1);
+    }, autotapRate);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [autotapRate]);
 
   const handleStatChange = (type: ItemType, value: number) => {
     switch (type) {
       case ItemType.multitap:
-        setStats((prev) => {
-          const newStats = prev;
-          newStats.tapGain = value;
-          return newStats;
-        });
+        setTapGain(value);
         setMultitapLevel((prevLvl) => prevLvl + 1);
         break;
       case ItemType.autotap:
-        setStats((prev) => {
-          const newStats = prev;
-          newStats.autotapRate = value;
-          return newStats;
-        });
+        setAutotapRate(value);
         setAutotapLevel((prevLvl) => prevLvl + 1);
         break;
       case ItemType.crittap:
-        setStats((prev) => {
-          const newStats = prev;
-          newStats.critChance = value;
-          return newStats;
-        });
+        setCritChance(value);
         setCrittapLevel((prevLvl) => prevLvl + 1);
         break;
     }
   };
 
-  const handleBalanceChange = (value: number) => {
-    setBalance(value);
+  const spawnPlusEffect = (pos: Position) => {
+    setEffectPositions([...effectPositions, pos]);
+
+    setTimeout(() => {
+      setEffectPositions((prev) => 
+        prev.filter((prevPos) => prevPos !== pos)
+      );
+    }, 1000);
   };
 
-  const handleTap = () => {
-    setBalance((prevBalance) => prevBalance + stats.tapGain);
-  };
-
-  const handleShopToggle = () => {
-    setShopActive(!shopActive);
+  const handleTap = (event: MouseEvent) => {
+    setBalance((prevBalance) => prevBalance + tapGain);
+    spawnPlusEffect({ x: event.clientX, y: event.clientY });
   };
 
   return (
@@ -84,16 +70,19 @@ function App() {
       {enableCheats && (
         <Cheats onCheatApply={() => setBalance((prev) => prev + 1000)} />
       )}
-      <ShopToggle onShopToggle={handleShopToggle} />
+      <ShopToggle onShopToggle={() => setShopActive(!shopActive)} />
       <StatsDisplay
         multitapLvl={multitapLevel}
         autotapLvl={autotapLevel}
         crittapLvl={crittapLevel}
-        tapGain={stats.tapGain}
-        autotapRate={stats.autotapRate}
-        critChance={stats.critChance}
+        tapGain={tapGain}
+        autotapRate={autotapRate}
+        critChance={critChance}
       />
-      <Pivo onTap={handleTap} counter={balance} active={!shopActive} />
+      <Hamster onTap={handleTap} counter={balance} active={!shopActive} />
+      {effectPositions.map((pos: Position, index) => (
+        <PlusEffect value={tapGain} pos={pos} key={index} />
+      ))}
       <div className="shop-wrapper">
         {shopActive && (
           <Shop
@@ -102,7 +91,7 @@ function App() {
             crittapLevel={crittapLevel}
             balance={balance}
             onPurchaseAbort={() => alert("not enough money")}
-            onBalanceChange={handleBalanceChange}
+            onBalanceChange={(value) => setBalance(value)}
             onStatChange={handleStatChange}
           />
         )}

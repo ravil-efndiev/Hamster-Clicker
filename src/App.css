@@ -110,6 +110,21 @@ body {
     justify-content: center;
 }
 
-.stat {
+.plus-effect {
+    position: absolute;
+    font-size: 1em;
+    color:#1d1d1d;
+    animation: plus-effect forwards 2s;
+    pointer-events: none;
+}
 
+@keyframes plus-effect {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(0, 50px);
+    }
 }
