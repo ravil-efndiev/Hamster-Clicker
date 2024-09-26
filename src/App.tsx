@@ -7,6 +7,7 @@ import Cheats from "./components/Cheats";
 import StatsDisplay from "./components/StatsDisplay";
 import PlusEffect, { Position } from "./components/PlusEffect";
 import { ItemType } from "./Templates";
+import { v4 as uuidv4 } from 'uuid';
 
 function App() {
   const [balance, setBalance] = useState(0);
@@ -62,7 +63,7 @@ function App() {
 
   const handleTap = (event: MouseEvent) => {
     setBalance((prevBalance) => prevBalance + tapGain);
-    spawnPlusEffect({ x: event.clientX, y: event.clientY });
+    spawnPlusEffect({ x: event.clientX, y: event.clientY, uuid: uuidv4() });
   };
 
   return (
@@ -80,8 +81,8 @@ function App() {
         critChance={critChance}
       />
       <Hamster onTap={handleTap} counter={balance} active={!shopActive} />
-      {effectPositions.map((pos: Position, index) => (
-        <PlusEffect value={tapGain} pos={pos} key={index} />
+      {effectPositions.map((pos: Position) => (
+        <PlusEffect value={tapGain} pos={pos} key={pos.uuid} />
       ))}
       <div className="shop-wrapper">
         {shopActive && (

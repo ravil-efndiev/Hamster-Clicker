@@ -18,6 +18,11 @@ body {
 .pivo-image {
     width: 100%;
     transition: scale 100ms;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 
 .counter {
@@ -40,7 +45,7 @@ body {
 .shop {
     z-index: 2;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(256px, 256px));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 300px));
     justify-content: center;
     justify-self: center;
     gap: 20px;
@@ -113,18 +118,6 @@ body {
 .plus-effect {
     position: absolute;
     font-size: 1em;
-    color:#1d1d1d;
-    animation: plus-effect forwards 2s;
     pointer-events: none;
 }
 
-@keyframes plus-effect {
-    0% {
-        opacity: 1;
-        transform: translate(0, 0);
-    }
-    100% {
-        opacity: 0;
-        transform: translate(0, 50px);
-    }
-}
