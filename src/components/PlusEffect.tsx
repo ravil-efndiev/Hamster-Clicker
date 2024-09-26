@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 export type Position = {
   x: number;
   y: number;
-  uuid: number; // for key property
+  uuid: string; // for key property
 };
 
 interface Props {
@@ -15,13 +15,15 @@ function PlusEffect({ value, pos }: Props) {
   const [opacity, setOpacity] = useState(1);
   const [downOffset, setDownOffset] = useState(0);
 
+  const browserMinUpdate = 40;
+
   useEffect(() => {
     let timer = 0;
     const interval = setInterval(() => {
-      timer += 40;
+      timer += browserMinUpdate;
       setOpacity(1 / timer * 100);
       setDownOffset(-timer / 20);
-    }, 40);
+    }, browserMinUpdate);
 
     return () => clearInterval(interval);
   }, [setOpacity]);

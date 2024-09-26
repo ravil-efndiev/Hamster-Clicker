@@ -6,8 +6,8 @@ import ShopToggle from "./components/ShopToggle";
 import Cheats from "./components/Cheats";
 import StatsDisplay from "./components/StatsDisplay";
 import PlusEffect, { Position } from "./components/PlusEffect";
-import { ItemType } from "./Templates";
-import { v4 as uuidv4 } from 'uuid';
+import { energyRestoreTemplate, ItemType } from "./Templates";
+import { v4 as uuidv4 } from "uuid";
 
 function App() {
   const [balance, setBalance] = useState(0);
@@ -23,16 +23,39 @@ function App() {
 
   const [effectPositions, setEffectPositions] = useState<Position[]>([]);
 
-  const enableCheats = false;
+  const [energy, setEnergy] = useState(1000);
+  const [energyRestoreRate, setEnergyRestoreRate] = useState(
+    energyRestoreTemplate.baseValue
+  );
+  const [energyRestoreLevel, setEnergyRestoreLevel] = useState(0);
+  const [maxEnergy, setMaxEnergy] = useState(1000);
+  const [maxEnergyLevel, setMaxEnergyLevel] = useState(0);
+
+  const enableCheats = true;
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const arInterval = setInterval(() => {
       if (!autotapRate) return;
       setBalance((prevBalance) => prevBalance + 1);
     }, autotapRate);
 
-    return () => clearInterval(interval);
-  }, [autotapRate]);
+    const energyInterval = setInterval(() => {
+      if (energy < maxEnergy) setEnergy((prevEnergy) => prevEnergy + 1);
+    }, energyRestoreRate);
+
+    return () => {
+      clearInterval(arInterval);
+      clearInterval(energyInterval);
+    };
+  }, [
+    autotapRate,
+    energyRestoreRate,
+    maxEnergy,
+    energy,
+    setEnergyRestoreRate,
+    setEnergy,
+    setBalance,
+  ]);
 
   const handleStatChange = (type: ItemType, value: number) => {
     switch (type) {
@@ -48,6 +71,15 @@ function App() {
         setCritChance(value);
         setCrittapLevel((prevLvl) => prevLvl + 1);
         break;
+      case ItemType.energyRestore:
+        setEnergyRestoreRate(value);
+        setEnergyRestoreLevel((prevLvl) => prevLvl + 1);
+        break;
+      case ItemType.maxEnergy:
+        setMaxEnergy(value);
+        setEnergy(value);
+        setMaxEnergyLevel((prevLvl) => prevLvl + 1);
+        break;
     }
   };
 
@@ -55,15 +87,15 @@ function App() {
     setEffectPositions([...effectPositions, pos]);
 
     setTimeout(() => {
-      setEffectPositions((prev) => 
-        prev.filter((prevPos) => prevPos !== pos)
-      );
+      setEffectPositions((prev) => prev.filter((prevPos) => prevPos !== pos));
     }, 1000);
   };
 
   const handleTap = (event: MouseEvent) => {
-    setBalance((prevBalance) => prevBalance + tapGain);
+    if (energy - tapGain < 0) return;
+    setEnergy((prevEnergy) => prevEnergy - tapGain);
     spawnPlusEffect({ x: event.clientX, y: event.clientY, uuid: uuidv4() });
+    setBalance((prevBalance) => prevBalance + tapGain);
   };
 
   return (
@@ -79,6 +111,7 @@ function App() {
         tapGain={tapGain}
         autotapRate={autotapRate}
         critChance={critChance}
+        energy={energy}
       />
       <Hamster onTap={handleTap} counter={balance} active={!shopActive} />
       {effectPositions.map((pos: Position) => (
@@ -90,6 +123,8 @@ function App() {
             multitapLevel={multitapLevel}
             autotapLevel={autotapLevel}
             crittapLevel={crittapLevel}
+            energyRestoreLevel={energyRestoreLevel}
+            maxEnergyLevel={maxEnergyLevel}
             balance={balance}
             onPurchaseAbort={() => alert("not enough money")}
             onBalanceChange={(value) => setBalance(value)}
