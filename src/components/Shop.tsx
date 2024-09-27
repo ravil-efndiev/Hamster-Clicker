@@ -158,7 +158,7 @@ function Shop({
           itemName={`Energy Restore ${energyRestoreLevel + 1}`}
           itemDesc={`Energy will restore once every ${nextEnRestore / 1000
             } seconds`}
-          itemPrice={energyRestoreTemplate.basePrice}
+          itemPrice={calcItemPrice(energyRestoreTemplate.basePrice, energyRestoreLevel, 5)}
           onPurchase={handleItemPurchase}
           itemLvlLimit={3}
         />
@@ -166,7 +166,7 @@ function Shop({
           type={ItemType.maxEnergy}
           itemName={`Maximum Energy ${maxEnergyLevel + 1}`}
           itemDesc={`Your maximum energy amount will increase to ${nextMaxEnergy}`}
-          itemPrice={maxEnergyTemplate.basePrice}
+          itemPrice={calcItemPrice(maxEnergyTemplate.basePrice, maxEnergyLevel, 2)}
           onPurchase={handleItemPurchase}
           itemLvlLimit={5}
         />
