@@ -6,6 +6,7 @@ import {
   ItemType,
   energyRestoreTemplate,
   maxEnergyTemplate,
+  EnergyRestoreValues,
 } from "../Templates";
 import { useState } from "react";
 
@@ -16,7 +17,7 @@ interface Props {
   crittapLevel: number;
   energyRestoreLevel: number;
   maxEnergyLevel: number;
-  onPurchaseAbort: () => void;
+  onPurchaseAbort: (message: string) => void;
   onBalanceChange: (value: number) => void;
   onStatChange: (type: ItemType, vlaue: number) => void;
 }
@@ -42,20 +43,29 @@ function Shop({
     crittapTemplate.baseValue * (crittapLevel + 1)
   );
   const [nextEnRestore, setNextEnRestore] = useState(
-    energyRestoreTemplate.baseValue / (energyRestoreLevel + 1)
+    energyRestoreLevel === 0 ? EnergyRestoreValues.first : EnergyRestoreValues.second
   );
   const [nextMaxEnergy, setNextMaxEnergy] = useState(
-    maxEnergyTemplate.baseValue + maxEnergyLevel
+    maxEnergyTemplate.baseValue + ((maxEnergyLevel + 1) * 500)
   );
 
-  const handleItemPurchase = (type: ItemType, price: number) => {
+  const handleItemPurchase = (type: ItemType, price: number, lvlLimit: number) => {
     if (balance < price) {
-      onPurchaseAbort();
+      onPurchaseAbort("Not enough money!");
       return;
+    }
+
+    const checkForLevelLimit = (lvl: number): boolean => {
+      if (lvl + 1 > lvlLimit && lvlLimit > 0) {
+        onPurchaseAbort("You have reached the limit of this upgrade");
+        return false;
+      }
+      return true;
     }
 
     switch (type) {
       case ItemType.multitap:
+        if (!checkForLevelLimit(multitapLevel)) return;
         setNextTapGain(multitapTemplate.baseValue + (multitapLevel + 1));
         onStatChange(
           ItemType.multitap,
@@ -64,6 +74,7 @@ function Shop({
         onBalanceChange(balance - price);
         break;
       case ItemType.autotap:
+        if (!checkForLevelLimit(autotapLevel)) return;
         setNextAutotapRate(autotapTemplate.baseValue / (autotapLevel + 2));
         onStatChange(
           ItemType.autotap,
@@ -72,6 +83,7 @@ function Shop({
         onBalanceChange(balance - price);
         break;
       case ItemType.crittap:
+        if (!checkForLevelLimit(crittapLevel)) return;
         setNextCritChance(crittapTemplate.baseValue * (crittapLevel + 1));
         onStatChange(
           ItemType.crittap,
@@ -80,17 +92,19 @@ function Shop({
         onBalanceChange(balance - price);
         break;
       case ItemType.energyRestore:
+        if (!checkForLevelLimit(energyRestoreLevel)) return;
         setNextEnRestore(
-          energyRestoreTemplate.baseValue / (energyRestoreLevel + 1)
+          EnergyRestoreValues.second
         );
         onStatChange(
           ItemType.energyRestore,
-          energyRestoreTemplate.baseValue / (energyRestoreLevel + 1)
+          energyRestoreLevel === 0 ? EnergyRestoreValues.first : EnergyRestoreValues.second
         );
         onBalanceChange(balance - price);
         break;
       case ItemType.maxEnergy:
-        setNextMaxEnergy(maxEnergyTemplate.baseValue + maxEnergyLevel * 500);
+        if (!checkForLevelLimit(maxEnergyLevel)) return;
+        setNextMaxEnergy(maxEnergyTemplate.baseValue + ((maxEnergyLevel + 1) * 500));
         onStatChange(
           ItemType.maxEnergy,
           maxEnergyTemplate.baseValue + maxEnergyLevel * 500
@@ -115,19 +129,20 @@ function Shop({
             multitapLevel,
             1.5
           )}
+          itemLvlLimit={0}
           onPurchase={handleItemPurchase}
         />
         <ShopItem
           type={ItemType.autotap}
           itemName={`Autotap ${autotapLevel + 1}`}
-          itemDesc={`Automatically get a point every ${
-            nextAutotapRate / 1000
-          } seconds`}
+          itemDesc={`Automatically get a point every ${nextAutotapRate / 1000
+            } seconds`}
           itemPrice={calcItemPrice(
             autotapTemplate.basePrice,
             autotapLevel,
             1.3
           )}
+          itemLvlLimit={0}
           onPurchase={handleItemPurchase}
         />
         <ShopItem
@@ -136,15 +151,16 @@ function Shop({
           itemDesc={`Every tap has ${nextCritChance}% chance to gain 5x the normal value`}
           itemPrice={calcItemPrice(crittapTemplate.basePrice, crittapLevel, 2)}
           onPurchase={handleItemPurchase}
+          itemLvlLimit={10}
         />
         <ShopItem
           type={ItemType.energyRestore}
           itemName={`Energy Restore ${energyRestoreLevel + 1}`}
-          itemDesc={`Energy will restore once every ${
-            nextEnRestore / 1000
-          } seconds`}
+          itemDesc={`Energy will restore once every ${nextEnRestore / 1000
+            } seconds`}
           itemPrice={energyRestoreTemplate.basePrice}
           onPurchase={handleItemPurchase}
+          itemLvlLimit={3}
         />
         <ShopItem
           type={ItemType.maxEnergy}
@@ -152,6 +168,7 @@ function Shop({
           itemDesc={`Your maximum energy amount will increase to ${nextMaxEnergy}`}
           itemPrice={maxEnergyTemplate.basePrice}
           onPurchase={handleItemPurchase}
+          itemLvlLimit={5}
         />
         <ShopItem
           type={ItemType.crittap}
@@ -159,6 +176,7 @@ function Shop({
           itemDesc={``}
           itemPrice={0}
           onPurchase={() => console.log("not implemented")}
+          itemLvlLimit={0}
         />
         <div className="shop-balance">
           <p className="text-center">${balance}</p>

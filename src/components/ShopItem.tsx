@@ -5,7 +5,8 @@ interface Props {
   itemName: string;
   itemDesc: string;
   itemPrice: number;
-  onPurchase: (type: ItemType, price: number) => void;
+  itemLvlLimit: number;
+  onPurchase: (type: ItemType, price: number, lvlLimit: number) => void;
 }
 
 function ShopItem(props: Props) {
@@ -13,7 +14,7 @@ function ShopItem(props: Props) {
     <>
       <div
         className="card shop-item text-center"
-        onClick={() => props.onPurchase(props.type, props.itemPrice)}
+        onClick={() => props.onPurchase(props.type, props.itemPrice, props.itemLvlLimit)}
       >
         <div className="card-body">
           <h5 className="card-title shop-item__title">{props.itemName}</h5>

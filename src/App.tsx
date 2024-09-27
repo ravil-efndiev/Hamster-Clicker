@@ -24,9 +24,7 @@ function App() {
   const [effectPositions, setEffectPositions] = useState<Position[]>([]);
 
   const [energy, setEnergy] = useState(1000);
-  const [energyRestoreRate, setEnergyRestoreRate] = useState(
-    energyRestoreTemplate.baseValue
-  );
+  const [energyRestoreRate, setEnergyRestoreRate] = useState(1000);
   const [energyRestoreLevel, setEnergyRestoreLevel] = useState(0);
   const [maxEnergy, setMaxEnergy] = useState(1000);
   const [maxEnergyLevel, setMaxEnergyLevel] = useState(0);
@@ -126,7 +124,7 @@ function App() {
             energyRestoreLevel={energyRestoreLevel}
             maxEnergyLevel={maxEnergyLevel}
             balance={balance}
-            onPurchaseAbort={() => alert("not enough money")}
+            onPurchaseAbort={(message) => alert(message)}
             onBalanceChange={(value) => setBalance(value)}
             onStatChange={handleStatChange}
           />

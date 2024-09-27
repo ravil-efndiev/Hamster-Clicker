@@ -20,7 +20,7 @@ export const crittapTemplate: Template = {
 
 export const energyRestoreTemplate: Template = {
   basePrice: 1000,
-  baseValue: 500,
+  baseValue: 1000,
 };
 
 export const maxEnergyTemplate: Template = {
@@ -34,4 +34,10 @@ export enum ItemType {
   crittap,
   energyRestore,
   maxEnergy,
+}
+
+export enum EnergyRestoreValues {
+  zero = 1000,
+  first = 750,
+  second = 500
 }
