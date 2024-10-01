@@ -46,7 +46,7 @@ function Shop({
     energyRestoreLevel === 0 ? EnergyRestoreValues.first : EnergyRestoreValues.second
   );
   const [nextMaxEnergy, setNextMaxEnergy] = useState(
-    maxEnergyTemplate.baseValue + ((maxEnergyLevel + 1) * 500)
+    maxEnergyTemplate.baseValue + (maxEnergyLevel + 1) * 500
   );
 
   const handleItemPurchase = (type: ItemType, price: number, lvlLimit: number) => {
@@ -104,10 +104,10 @@ function Shop({
         break;
       case ItemType.maxEnergy:
         if (!checkForLevelLimit(maxEnergyLevel)) return;
-        setNextMaxEnergy(maxEnergyTemplate.baseValue + ((maxEnergyLevel + 1) * 500));
+        setNextMaxEnergy(maxEnergyTemplate.baseValue + (maxEnergyLevel + 2) * 500);
         onStatChange(
           ItemType.maxEnergy,
-          maxEnergyTemplate.baseValue + maxEnergyLevel * 500
+          maxEnergyTemplate.baseValue + (maxEnergyLevel + 1) * 500
         );
         onBalanceChange(balance - price);
         break;
